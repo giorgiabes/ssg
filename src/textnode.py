@@ -31,7 +31,7 @@ class TextNode:
         - Two TextNode instances are equal (`==`) if all three fields match: `text`, `text_type`, and `url`.
 
     Examples:
-        TextNode("OpenAI", TextType.LINK, "https://openai.com")
+        TextNode("a", TextType.LINK, "https://openai.com")
         → Represents a hyperlink.
 
         TextNode("**bold**", TextType.BOLD)

@@ -110,3 +110,41 @@ class LeafNode(HTMLNode):
             f"value={self.value!r}, "
             f"props={self.props!r})"
         )
+
+class ParentNode(HTMLNode):
+    """
+    Represents an HTML node that contains other nested HTML nodes as children.
+
+    A ParentNode is a non-leaf HTML node used to build complex, nested HTML structures.
+    It requires a tag (e.g. "div", "p") and a list of children, which can be LeafNodes
+    or other ParentNodes. The `value` field is always None because ParentNodes render
+    their children instead of holding direct text content.
+
+    Example:
+        node = ParentNode("p", [
+            LeafNode("b", "Bold text"),
+            LeafNode(None, "normal text"),
+            LeafNode("i", "italic text"),
+        ])
+
+        node.to_html()  # Returns: "<p><b>Bold text</b>normal text<i>italic text</i></p>"
+
+    Attributes:
+        tag (str): The HTML tag name (e.g., "div", "ul").
+        children (list): A list of HTMLNode instances to render within the parent tag.
+        props (dict, optional): HTML attributes like class, id, etc.
+    """
+    def __init__(
+        self,
+        tag: str,
+        children: list,
+        props: dict | None = None,
+    ) -> None:
+        if not tag:
+            raise ValueError("ParentNode requires a tag.")
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        children_html = "".join(child.to_html() for child in self.children)
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+
