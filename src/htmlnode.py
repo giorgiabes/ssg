@@ -60,3 +60,53 @@ class HTMLNode:
             f"children={self.children!r}, "
             f"props={self.props!r})"
         )
+
+
+class LeafNode(HTMLNode):
+    """
+    Represents a leaf HTML node — an HTML element that contains no children.
+
+    This class is a specialized version of HTMLNode used to render HTML tags
+    that contain only a value (text content) and optional attributes, but no child nodes.
+
+    A LeafNode requires a `value` and optionally accepts a `tag` and `props`.
+    It does not allow child nodes.
+
+    Examples:
+        LeafNode("p", "This is a paragraph.").to_html()
+        => "<p>This is a paragraph.</p>"
+
+        LeafNode("a", "Click me!", {"href": "https://example.com"}).to_html()
+        => '<a href="https://example.com">Click me!</a>'
+
+        LeafNode(None, "Just raw text").to_html()
+        => "Just raw text"
+
+    Rules:
+    - The `value` is required and must be a non-empty string.
+    - The `tag` can be None (in which case only the raw value is returned).
+    - The `props` dictionary represents HTML attributes and is optional.
+    - LeafNode does not accept or support child nodes.
+    """
+
+    def __init__(
+        self,
+        tag: str | None,
+        value: str,
+        props: dict | None = None,
+    ) -> None:
+        if not value:
+            raise ValueError("All leaf nodes must have a non-empty value.")
+        super().__init__(tag=tag, value=value, children=None, props=props)
+
+    def to_html(self):
+        if self.tag is None:
+            return self.value
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+    def __repr__(self) -> str:
+        return (
+            f"HTMLNode(tag={self.tag!r}, "
+            f"value={self.value!r}, "
+            f"props={self.props!r})"
+        )
