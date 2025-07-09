@@ -1,14 +1,19 @@
-from textnode import TextType, TextNode
-from inline_parser import split_nodes_link
+from block_parser import markdown_to_blocks
 
 
 def main():
-    node = TextNode(
-        "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
-        TextType.TEXT,
-    )
+    pass
+    md = """
+        This is **bolded** paragraph
 
-    split_nodes_link([node])
+        This is another paragraph with _italic_ text and `code` here
+        This is the same paragraph on a new line
+
+        - This is a list
+        - with items
+        """
+
+    print(markdown_to_blocks(md))
 
 
 if __name__ == "__main__":
