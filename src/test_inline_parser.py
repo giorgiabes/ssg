@@ -1,5 +1,10 @@
 import unittest
-from inline_parser import split_nodes_delimiter, split_nodes_image, split_nodes_link
+from inline_parser import (
+    split_nodes_delimiter,
+    split_nodes_image,
+    split_nodes_link,
+    text_to_textnodes,
+)
 from textnode import TextNode, TextType
 
 
@@ -250,6 +255,81 @@ class TestSplitLinks(unittest.TestCase):
             split_nodes_link([node]),
             [TextNode("text-1_2!@#", TextType.LINK, "url.com/page")],
         )
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_full_markdown_line(self):
+        text = (
+            "This is **text** with an _italic_ word and a `code block` and an "
+            "![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a "
+            "[link](https://boot.dev)"
+        )
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode(
+                "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+            ),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_only_plain_text(self):
+        text = "Just some plain text without markdown."
+        expected = [TextNode("Just some plain text without markdown.", TextType.TEXT)]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_markdown_at_edges(self):
+        text = "**bold** in the beginning and at the end **endbold**"
+        expected = [
+            TextNode("bold", TextType.BOLD),
+            TextNode(" in the beginning and at the end ", TextType.TEXT),
+            TextNode("endbold", TextType.BOLD),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_back_to_back_markdown(self):
+        text = "**bold1****bold2**"
+        expected = [TextNode("bold1", TextType.BOLD), TextNode("bold2", TextType.BOLD)]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_empty_string(self):
+        self.assertEqual(text_to_textnodes(""), [])
+
+    def test_only_image(self):
+        text = "![alt](https://image.com/img.png)"
+        expected = [TextNode("alt", TextType.IMAGE, "https://image.com/img.png")]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_special_characters(self):
+        text = "_italic_ and **bold!** and [weird text?](https://url.com/?q=a)"
+        expected = [
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("bold!", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("weird text?", TextType.LINK, "https://url.com/?q=a"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_mixed_order(self):
+        text = "`code` before **bold** and _italic_ with ![img](url)"
+        expected = [
+            TextNode("code", TextType.CODE),
+            TextNode(" before ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" with ", TextType.TEXT),
+            TextNode("img", TextType.IMAGE, "url"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)
 
 
 if __name__ == "__main__":
