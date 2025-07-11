@@ -1,6 +1,7 @@
 from htmlnode import LeafNode
 from textnode import TextNode, TextType
 
+
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     if text_node.text_type == TextType.TEXT:
         return LeafNode(None, text_node.text)
@@ -15,9 +16,12 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     elif text_node.text_type == TextType.IMAGE:
         if not text_node.url:
             raise ValueError("TextType.IMAGE requires a non-empty URL")
-        return LeafNode("img", text_node.text, {
-            "src": text_node.url,
-            "alt": text_node.text,
-        })
+        return LeafNode(
+            "img",
+            text_node.text,
+            {
+                "src": text_node.url,
+                "alt": text_node.text,
+            },
+        )
     raise ValueError(f"Unsupported TextType: {text_node.text_type}")
-
