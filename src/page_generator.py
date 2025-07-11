@@ -32,3 +32,16 @@ def extract_title(markdown: str) -> str:
         if line.startswith("# "):
             return line[2:].strip()
     raise Exception("No H1 title found in markdown.")
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in os.listdir(dir_path_content):
+        entry_path = os.path.join(dir_path_content, entry)
+        dest_path = os.path.join(dest_dir_path, entry)
+
+        if os.path.isdir(entry_path):
+            generate_pages_recursive(entry_path, template_path, dest_path)
+
+        elif entry.endswith(".md"):
+            output_file_path = os.path.join(dest_dir_path, "index.html")
+            generate_page(entry_path, template_path, output_file_path)

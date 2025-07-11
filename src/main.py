@@ -1,11 +1,11 @@
 import os
 import shutil
-from page_generator import generate_page
+from page_generator import generate_pages_recursive
 
 
 def main():
     copy_static_files()
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 def copy_static_files(src_dir="static", dest_dir="public"):
