@@ -1,9 +1,11 @@
 import os
 import shutil
+from page_generator import generate_page
 
 
 def main():
     copy_static_files()
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 
 def copy_static_files(src_dir="static", dest_dir="public"):
