@@ -1,15 +1,18 @@
 import os
 import shutil
+import sys
 from page_generator import generate_pages_recursive
 
 
 def main():
+    # Get basepath from CLI argument, default to "/"
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
     copy_static_files()
-    generate_pages_recursive("content", "template.html", "public")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 
-def copy_static_files(src_dir="static", dest_dir="public"):
-    # Step 1: Remove old public directory
+def copy_static_files(src_dir="static", dest_dir="docs"):
+    # Step 1: Remove old docs directory
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
         print(f"Deleted old '{dest_dir}' directory.")
